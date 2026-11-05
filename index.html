@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Trenér - Prototyp</title>
+  <title>AI Trenér - S AI Integrací</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -19,9 +19,9 @@
         <span class="font-bold text-xl tracking-wide">AI Trenér</span>
       </div>
       <div id="user-status" class="text-sm text-slate-400">
-        <!-- Připraveno pro Firebase Auth stav -->
         <span class="inline-flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-amber-500"></span> Režim bez přihlášení (Demo)
+          <span id="api-status-dot" class="w-2 h-2 rounded-full bg-amber-500"></span> 
+          <span id="api-status-text">Zadejte API klíč</span>
         </span>
       </div>
     </div>
@@ -29,50 +29,64 @@
 
   <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
     
-    <!-- Levý panel: Vstupní profil sportovce -->
-    <section class="lg:col-span-1 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 shadow-xl">
-      <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-emerald-400">
-        <i class="fa-solid fa-user-gear"></i> Profil sportovce
-      </h2>
+    <!-- Levý panel: Nastavení API & Profil sportovce -->
+    <section class="lg:col-span-1 space-y-6">
+      
+      <!-- Karta pro nastavení API Klíče -->
+      <div class="bg-slate-800/80 border border-amber-500/30 rounded-2xl p-6 shadow-xl">
+        <h2 class="text-md font-bold mb-2 flex items-center gap-2 text-amber-400">
+          <i class="fa-solid fa-key"></i> Gemini API Klíč
+        </h2>
+        <p class="text-xs text-slate-400 mb-3">Vložte váš klíč z Google AI Studio pro aktivaci živé AI.</p>
+        <input type="password" id="api-key-input" placeholder="AIzaSy..." 
+          class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-amber-500 text-amber-200">
+      </div>
 
-      <form id="profile-form" class="space-y-4">
-        <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Sport</label>
-          <input type="text" id="sport" placeholder="např. Fotbal, Běh, Plavání..." required
-            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
-        </div>
+      <!-- Profil sportovce -->
+      <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 shadow-xl">
+        <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-emerald-400">
+          <i class="fa-solid fa-user-gear"></i> Profil sportovce
+        </h2>
 
-        <div class="grid grid-cols-2 gap-4">
+        <form id="profile-form" class="space-y-4">
           <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Věk</label>
-            <input type="number" id="age" placeholder="16" min="10" max="100" required
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Sport</label>
+            <input type="text" id="sport" placeholder="např. Fotbal, Běh, Plavání..." required
               class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
           </div>
-          <div>
-            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Váha (kg)</label>
-            <input type="number" id="weight" placeholder="68" min="30" max="200" required
-              class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Věk</label>
+              <input type="number" id="age" placeholder="16" min="10" max="100" required
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Váha (kg)</label>
+              <input type="number" id="weight" placeholder="68" min="30" max="200" required
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+            </div>
           </div>
-        </div>
 
-        <div>
-          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Hlavní cíl</label>
-          <select id="goal" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
-            <option value="performance">Zlepšení výkonu & rychlosti</option>
-            <option value="endurance">Budování vytrvalosti</option>
-            <option value="weight_opt">Optimalizace váhy pro sport</option>
-            <option value="regeneration">Lepší strava a regenerace</option>
-          </select>
-        </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Hlavní cíl</label>
+            <select id="goal" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+              <option value="Zlepšení výkonu a dynamiky">Zlepšení výkonu & rychlosti</option>
+              <option value="Budování vytrvalosti">Budování vytrvalosti</option>
+              <option value="Doporučená váha a strava pro daný sport">Optimalizace váhy pro sport</option>
+              <option value="Regenerace a prevence zranění">Lepší strava a regenerace</option>
+            </select>
+          </div>
 
-        <button type="submit" 
-          class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
-          <i class="fa-solid fa-save"></i> Uložit profil
-        </button>
-      </form>
+          <button type="submit" 
+            class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
+            <i class="fa-solid fa-save"></i> Uložit profil
+          </button>
+        </form>
+      </div>
     </section>
 
-    <!-- Pravý panel: Přehled a rozhraní trenéra -->
+    <!-- Pravý panel: Chat s AI Trenérem -->
     <section class="lg:col-span-2 space-y-6">
 
       <!-- Souhrnné karty -->
@@ -87,31 +101,32 @@
         </div>
         <div class="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
           <p class="text-xs text-slate-400 uppercase">Stav AI Trenéra</p>
-          <p class="text-lg font-bold text-emerald-400 mt-1">Připraven (Mock mode)</p>
+          <p id="display-status" class="text-lg font-bold text-amber-400 mt-1">Čeká na API klíč</p>
         </div>
       </div>
 
-      <!-- Okno pro komunikaci s AI (Zatím simulovaná výstupy) -->
-      <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 shadow-xl flex flex-col h-[400px]">
+      <!-- Okno pro komunikaci s AI -->
+      <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 shadow-xl flex flex-col h-[500px]">
         <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-400">
-          <i class="fa-solid fa-robot"></i> Asistent & Plánovač
+          <i class="fa-solid fa-robot"></i> AI Osobní Trenér
         </h3>
 
         <!-- Chat / Output feed -->
         <div id="ai-feed" class="flex-1 overflow-y-auto space-y-4 pr-2 text-sm text-slate-300">
           <div class="bg-slate-900/80 rounded-lg p-3 border border-slate-700/40">
             <span class="text-emerald-400 font-semibold block mb-1">AI Trenér:</span>
-            Ahoj! Vyplň vlevo svůj profil a já ti připravím první doporučení pro trénink a stravu.
+            Ahoj! Vlož nahoře svůj Gemini API klíč, vyplň vlevo profil a napiš mi. Pomůžu ti s tréninkem, stravou i ideální váhou pro tvůj sport!
           </div>
         </div>
 
-        <!-- Vstup pro dotaz (Připraveno na napojení na LLM API) -->
+        <!-- Vstup pro dotaz -->
         <form id="chat-form" class="mt-4 flex gap-2">
           <input type="text" id="user-input" placeholder="Zeptej se trenéra na radu..." 
             class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
-          <button type="submit" 
-            class="bg-slate-700 hover:bg-slate-600 text-slate-100 px-4 py-2 rounded-lg transition-colors font-medium text-sm">
-            Odeslat
+          <button type="submit" id="send-btn"
+            class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-5 py-2 rounded-lg transition-colors text-sm flex items-center gap-2">
+            <span>Odeslat</span>
+            <i class="fa-solid fa-paper-plane"></i>
           </button>
         </form>
       </div>
@@ -120,81 +135,157 @@
 
   </main>
 
-  <!-- Základní JS logika (připraveno pro Firebase a AI API) -->
   <script>
-    // 1. Objekt pro uchování dat profilu (v budoucnu nahradí Firebase Firestore)
     let athleteProfile = {
       sport: '',
-      age: null,
-      weight: null,
+      age: '',
+      weight: '',
       goal: ''
     };
 
+    const apiKeyInput = document.getElementById('api-key-input');
     const profileForm = document.getElementById('profile-form');
     const chatForm = document.getElementById('chat-form');
     const aiFeed = document.getElementById('ai-feed');
+    const sendBtn = document.getElementById('send-btn');
 
-    // 2. Zpracování profilu
+    // Sledování zadání API klíče
+    apiKeyInput.addEventListener('input', () => {
+      const key = apiKeyInput.value.trim();
+      const statusDot = document.getElementById('api-status-dot');
+      const statusText = document.getElementById('api-status-text');
+      const displayStatus = document.getElementById('display-status');
+
+      if (key.length > 20) {
+        statusDot.className = "w-2 h-2 rounded-full bg-emerald-500";
+        statusText.textContent = "AI Připravena";
+        displayStatus.textContent = "Připraven";
+        displayStatus.className = "text-lg font-bold text-emerald-400 mt-1";
+      } else {
+        statusDot.className = "w-2 h-2 rounded-full bg-amber-500";
+        statusText.textContent = "Zadejte API klíč";
+        displayStatus.textContent = "Čeká na API klíč";
+        displayStatus.className = "text-lg font-bold text-amber-400 mt-1";
+      }
+    });
+
+    // Uložení profilu
     profileForm.addEventListener('submit', (e) => {
       e.preventDefault();
       
       athleteProfile.sport = document.getElementById('sport').value;
       athleteProfile.age = document.getElementById('age').value;
       athleteProfile.weight = document.getElementById('weight').value;
-      athleteProfile.goal = document.getElementById('goal').options[document.getElementById('goal').selectedIndex].text;
+      athleteProfile.goal = document.getElementById('goal').value;
 
-      // Aktualizace UI
       document.getElementById('display-sport').textContent = athleteProfile.sport;
       document.getElementById('display-goal').textContent = athleteProfile.goal;
 
-      addMessage('AI Trenér', `Profil uložen! Tvůj sport je **${athleteProfile.sport}** a hlavní cíl: **${athleteProfile.goal}**.`);
+      addMessage('AI Trenér', `Profil byl uložen! Jsi **${athleteProfile.sport}ista** (věk: ${athleteProfile.age}, váha: ${athleteProfile.weight}kg). Tvůj cíl je: **${athleteProfile.goal}**. Nyní se mě můžeš na cokoliv zeptat!`);
     });
 
-    // 3. Simulace odpovědi AI (připraveno pro fetch na API)
-    chatForm.addEventListener('submit', (e) => {
+    // Odeslání dotazu na Gemini API
+    chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const input = document.getElementById('user-input');
-      const text = input.value.trim();
-      
-      if (!text) return;
+      const userMessage = input.value.trim();
+      const apiKey = apiKeyInput.value.trim();
 
-      addMessage('Vy', text);
+      if (!userMessage) return;
+
+      if (!apiKey) {
+        alert('Prosím vložte nejprve váš Gemini API klíč v levém horním rohu!');
+        return;
+      }
+
+      addMessage('Vy', userMessage);
       input.value = '';
 
-      // Tady později proběhne volání AI API nebo Firebase funkce
-      setTimeout(() => {
-        addMessage('AI Trenér', `(Demo odpověď) Přijal jsem dotaz: "${text}". V plné verzi ti zde AI vygeneruje odpověď přímo pro sport ${athleteProfile.sport || 'který si vybereš'}.`);
-      }, 600);
+      // Zobrazení načítání
+      const loadingId = addLoadingMessage();
+      sendBtn.disabled = true;
+
+      try {
+        const responseText = await callGeminiAPI(userMessage, apiKey);
+        removeLoadingMessage(loadingId);
+        addMessage('AI Trenér', responseText);
+      } catch (error) {
+        removeLoadingMessage(loadingId);
+        addMessage('AI Trenér', '⚠️ Omlouvám se, nastala chyba při komunikaci s AI. Zkontrolujte API klíč.');
+        console.error(error);
+      } finally {
+        sendBtn.disabled = false;
+      }
     });
 
-    // Pomocná funkce pro přidání zprávy do chatu
+    // Funkce pro volání Gemini REST API
+    async function callGeminiAPI(prompt, apiKey) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+      // Kontext nastavený speciálně pro sportovního AI trenéra
+      const systemInstruction = `Jsi profesionální, motivující a odborný AI sportovní trenér. 
+Provozuješ poradenství v oblastech: zlepšování ve sportu, optimalizace výživy a stravy, a určování ideální váhy pro daný sport.
+Data uživatele:
+- Sport: ${athleteProfile.sport || 'Nespecifikováno'}
+- Věk: ${athleteProfile.age || 'Nespecifikováno'}
+- Váha: ${athleteProfile.weight || 'Nespecifikováno'} kg
+- Hlavní cíl: ${athleteProfile.goal || 'Nespecifikováno'}
+
+Odpovídej stručně, věcně, motivujícím tónem a strukturovaně v češtině.`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: `${systemInstruction}\n\nDotaz uživatele: ${prompt}` }]
+            }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Chyba: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    // Pomocné UI funkce
     function addMessage(sender, text) {
       const msgDiv = document.createElement('div');
       msgDiv.className = sender === 'Vy' 
         ? 'bg-emerald-950/40 rounded-lg p-3 border border-emerald-800/40 ml-6 text-emerald-100'
-        : 'bg-slate-900/80 rounded-lg p-3 border border-slate-700/40 mr-6';
+        : 'bg-slate-900/80 rounded-lg p-3 border border-slate-700/40 mr-6 text-slate-200';
       
-      msgDiv.innerHTML = `<span class="${sender === 'Vy' ? 'text-emerald-400' : 'text-emerald-400'} font-semibold block mb-1">${sender}:</span> ${text}`;
+      // Převod nového řádku na <br> pro lepší formátování
+      const formattedText = text.replace(/\n/g, '<br>');
+
+      msgDiv.innerHTML = `<span class="text-emerald-400 font-semibold block mb-1">${sender}:</span> ${formattedText}`;
       aiFeed.appendChild(msgDiv);
       aiFeed.scrollTop = aiFeed.scrollHeight;
     }
 
-    /* 
-      ======================================================
-      PŘÍPRAVA PRO FIREBASE & AI API (DOPLŇTE POZDĚJI):
-      ======================================================
+    function addLoadingMessage() {
+      const id = 'loading-' + Date.now();
+      const msgDiv = document.createElement('div');
+      msgDiv.id = id;
+      msgDiv.className = 'bg-slate-900/80 rounded-lg p-3 border border-slate-700/40 mr-6 text-slate-400 italic animate-pulse';
+      msgDiv.innerHTML = `<span class="text-emerald-400 font-semibold block mb-1">AI Trenér:</span> Přemýšlím nad odpovědí...`;
+      aiFeed.appendChild(msgDiv);
+      aiFeed.scrollTop = aiFeed.scrollHeight;
+      return id;
+    }
 
-      // 1. Firebase Auth init:
-      // import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
-      // import { getAuth } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-auth.js";
-
-      // 2. Firestore init:
-      // import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-firestore.js";
-
-      // 3. Funkce pro odeslání dotazu na AI API:
-      // async function askAI(prompt, profile) { ... }
-    */
+    function removeLoadingMessage(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
   </script>
 </body>
 </html>
-
