@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Trenér - Prototyp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+
+  <!-- Navigace -->
+  <nav class="border-b border-slate-800 bg-slate-950/50 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-emerald-500 text-slate-950 p-2 rounded-lg font-bold">
+          <i class="fa-solid fa-bolt text-lg"></i>
+        </div>
+        <span class="font-bold text-xl tracking-wide">AI Trenér</span>
+      </div>
+      <div id="user-status" class="text-sm text-slate-400">
+        <!-- Připraveno pro Firebase Auth stav -->
+        <span class="inline-flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span> Režim bez přihlášení (Demo)
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Levý panel: Vstupní profil sportovce -->
+    <section class="lg:col-span-1 bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 shadow-xl">
+      <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-emerald-400">
+        <i class="fa-solid fa-user-gear"></i> Profil sportovce
+      </h2>
+
+      <form id="profile-form" class="space-y-4">
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Sport</label>
+          <input type="text" id="sport" placeholder="např. Fotbal, Běh, Plavání..." required
+            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Věk</label>
+            <input type="number" id="age" placeholder="16" min="10" max="100" required
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Váha (kg)</label>
+            <input type="number" id="weight" placeholder="68" min="30" max="200" required
+              class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-400 mb-1">Hlavní cíl</label>
+          <select id="goal" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+            <option value="performance">Zlepšení výkonu & rychlosti</option>
+            <option value="endurance">Budování vytrvalosti</option>
+            <option value="weight_opt">Optimalizace váhy pro sport</option>
+            <option value="regeneration">Lepší strava a regenerace</option>
+          </select>
+        </div>
+
+        <button type="submit" 
+          class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
+          <i class="fa-solid fa-save"></i> Uložit profil
+        </button>
+      </form>
+    </section>
+
+    <!-- Pravý panel: Přehled a rozhraní trenéra -->
+    <section class="lg:col-span-2 space-y-6">
+
+      <!-- Souhrnné karty -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
+          <p class="text-xs text-slate-400 uppercase">Vybraný Sport</p>
+          <p id="display-sport" class="text-lg font-bold text-slate-200 mt-1">Zatím nezadáno</p>
+        </div>
+        <div class="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
+          <p class="text-xs text-slate-400 uppercase">Doporučený fokus</p>
+          <p id="display-goal" class="text-lg font-bold text-slate-200 mt-1">Zatím nezadáno</p>
+        </div>
+        <div class="bg-slate-800/30 border border-slate-700/50 rounded-xl p-4">
+          <p class="text-xs text-slate-400 uppercase">Stav AI Trenéra</p>
+          <p class="text-lg font-bold text-emerald-400 mt-1">Připraven (Mock mode)</p>
+        </div>
+      </div>
+
+      <!-- Okno pro komunikaci s AI (Zatím simulovaná výstupy) -->
+      <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 shadow-xl flex flex-col h-[400px]">
+        <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-emerald-400">
+          <i class="fa-solid fa-robot"></i> Asistent & Plánovač
+        </h3>
+
+        <!-- Chat / Output feed -->
+        <div id="ai-feed" class="flex-1 overflow-y-auto space-y-4 pr-2 text-sm text-slate-300">
+          <div class="bg-slate-900/80 rounded-lg p-3 border border-slate-700/40">
+            <span class="text-emerald-400 font-semibold block mb-1">AI Trenér:</span>
+            Ahoj! Vyplň vlevo svůj profil a já ti připravím první doporučení pro trénink a stravu.
+          </div>
+        </div>
+
+        <!-- Vstup pro dotaz (Připraveno na napojení na LLM API) -->
+        <form id="chat-form" class="mt-4 flex gap-2">
+          <input type="text" id="user-input" placeholder="Zeptej se trenéra na radu..." 
+            class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+          <button type="submit" 
+            class="bg-slate-700 hover:bg-slate-600 text-slate-100 px-4 py-2 rounded-lg transition-colors font-medium text-sm">
+            Odeslat
+          </button>
+        </form>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Základní JS logika (připraveno pro Firebase a AI API) -->
+  <script>
+    // 1. Objekt pro uchování dat profilu (v budoucnu nahradí Firebase Firestore)
+    let athleteProfile = {
+      sport: '',
+      age: null,
+      weight: null,
+      goal: ''
+    };
+
+    const profileForm = document.getElementById('profile-form');
+    const chatForm = document.getElementById('chat-form');
+    const aiFeed = document.getElementById('ai-feed');
+
+    // 2. Zpracování profilu
+    profileForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      athleteProfile.sport = document.getElementById('sport').value;
+      athleteProfile.age = document.getElementById('age').value;
+      athleteProfile.weight = document.getElementById('weight').value;
+      athleteProfile.goal = document.getElementById('goal').options[document.getElementById('goal').selectedIndex].text;
+
+      // Aktualizace UI
+      document.getElementById('display-sport').textContent = athleteProfile.sport;
+      document.getElementById('display-goal').textContent = athleteProfile.goal;
+
+      addMessage('AI Trenér', `Profil uložen! Tvůj sport je **${athleteProfile.sport}** a hlavní cíl: **${athleteProfile.goal}**.`);
+    });
+
+    // 3. Simulace odpovědi AI (připraveno pro fetch na API)
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('user-input');
+      const text = input.value.trim();
+      
+      if (!text) return;
+
+      addMessage('Vy', text);
+      input.value = '';
+
+      // Tady později proběhne volání AI API nebo Firebase funkce
+      setTimeout(() => {
+        addMessage('AI Trenér', `(Demo odpověď) Přijal jsem dotaz: "${text}". V plné verzi ti zde AI vygeneruje odpověď přímo pro sport ${athleteProfile.sport || 'který si vybereš'}.`);
+      }, 600);
+    });
+
+    // Pomocná funkce pro přidání zprávy do chatu
+    function addMessage(sender, text) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = sender === 'Vy' 
+        ? 'bg-emerald-950/40 rounded-lg p-3 border border-emerald-800/40 ml-6 text-emerald-100'
+        : 'bg-slate-900/80 rounded-lg p-3 border border-slate-700/40 mr-6';
+      
+      msgDiv.innerHTML = `<span class="${sender === 'Vy' ? 'text-emerald-400' : 'text-emerald-400'} font-semibold block mb-1">${sender}:</span> ${text}`;
+      aiFeed.appendChild(msgDiv);
+      aiFeed.scrollTop = aiFeed.scrollHeight;
+    }
+
+    /* 
+      ======================================================
+      PŘÍPRAVA PRO FIREBASE & AI API (DOPLŇTE POZDĚJI):
+      ======================================================
+
+      // 1. Firebase Auth init:
+      // import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
+      // import { getAuth } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-auth.js";
+
+      // 2. Firestore init:
+      // import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-firestore.js";
+
+      // 3. Funkce pro odeslání dotazu na AI API:
+      // async function askAI(prompt, profile) { ... }
+    */
+  </script>
+</body>
+</html>
